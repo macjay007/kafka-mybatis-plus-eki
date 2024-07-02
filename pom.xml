@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+  <!-- 全局参数 -->
+  <settings>
+<!--     <setting name="logImpl" value="SLF4J" /> -->
+    <setting name="logImpl" value="STDOUT_LOGGING"/> 
+    <!--slf4j配置  结束-->
+
+    <!-- 使全局的映射器启用或禁用缓存。 -->
+    <setting name="cacheEnabled" value="true"/>
+
+    <setting name="callSettersOnNulls" value="true" />
+
+    <!-- 全局启用或禁用延迟加载。当禁用时，所有关联对象都会即时加载。 -->
+    <setting name="lazyLoadingEnabled" value="true"/>
+
+    <!-- 当启用时，有延迟加载属性的对象在被调用时将会完全加载任意属性。否则，每种属性将会按需要加载。 -->
+    <setting name="aggressiveLazyLoading" value="true"/>
+
+    <!-- 是否允许单条sql 返回多个数据集  (取决于驱动的兼容性) default:true -->
+    <setting name="multipleResultSetsEnabled" value="true"/>
+
+    <!-- 是否可以使用列的别名 (取决于驱动的兼容性) default:true -->
+    <setting name="useColumnLabel" value="true"/>
+
+    <!-- 允许JDBC 生成主键。需要驱动器支持。如果设为了true，这个设置将强制使用被生成的主键，有一些驱动器不兼容不过仍然可以执行。  default:false  -->
+    <setting name="useGeneratedKeys" value="false"/>
+
+    <!-- 指定 MyBatis 如何自动映射 数据基表的列 NONE：不隐射　PARTIAL:部分  FULL:全部  -->
+    <setting name="autoMappingBehavior" value="PARTIAL"/>
+
+    <!-- 这是默认的执行类型  （SIMPLE: 简单； REUSE: 执行器可能重复使用prepared statements语句；BATCH: 执行器可以重复执行语句和批量更新）  -->
+    <setting name="defaultExecutorType" value="SIMPLE"/>
+
+    <!-- 使用驼峰命名法转换字段。 -->
+    <setting name="mapUnderscoreToCamelCase" value="true"/>
+
+    <!-- 设置本地缓存范围 session:就会有数据的共享  statement:语句范围 (这样就不会有数据的共享 ) default:session -->
+    <setting name="localCacheScope" value="SESSION"/>
+
+    <!-- 设置但JDBC类型为空时,某些驱动程序 要指定值,default:OTHER，插入空值时不需要指定类型 -->
+    <setting name="jdbcTypeForNull" value="NULL"/>
+
+  </settings>
+</configuration>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.7.17</version>
+  </parent>
+  <groupId>org.example</groupId>
+  <artifactId>kafka-mp</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>kafka-mp</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <java.version>1.8</java.version>
+    <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.liquibase</groupId>
+        <artifactId>liquibase-core</artifactId>
+        <version>4.28.0</version>
+    </dependency>
+    <!--		kafka                   -->
+    <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka-streams</artifactId>
+      <version>3.7.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.kafka</groupId>
+      <artifactId>spring-kafka</artifactId>
+      <version>2.9.13</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.pagehelper</groupId>
+      <artifactId>pagehelper-spring-boot-starter</artifactId>
+      <version>2.0.0</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>jsqlparser</artifactId>
+          <groupId>com.github.jsqlparser</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>mybatis-spring</artifactId>
+          <groupId>org.mybatis</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+      <version>8.2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.20</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>cn.hutool</groupId>
+      <artifactId>hutool-all</artifactId>
+      <version>5.8.20</version>
+    </dependency>
+    <!-- MyBatis-Plus -->
+    <dependency>
+      <groupId>com.baomidou</groupId>
+      <artifactId>mybatis-plus-boot-starter</artifactId>
+      <version>3.5.4.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.yulichang</groupId>
+      <artifactId>mybatis-plus-join</artifactId>
+      <version>1.4.13</version>
+    </dependency>
+    <dependency>
+      <groupId>com.alibaba.fastjson2</groupId>
+      <artifactId>fastjson2</artifactId>
+      <version>2.0.41</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>${project.artifactId}-${project.version}</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/lib/</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
