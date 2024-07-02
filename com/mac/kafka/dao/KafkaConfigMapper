@@ -1,0 +1,8 @@
+package com.mac.kafka.dao;
+
+
+import com.github.yulichang.base.MPJBaseMapper;
+import com.mac.kafka.model.ConfigEntity;
+
+public interface KafkaConfigMapper extends MPJBaseMapper<ConfigEntity> {
+}
