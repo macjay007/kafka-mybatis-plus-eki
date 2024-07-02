@@ -1,0 +1,53 @@
+package com.mac.kafka.service;
+
+import com.alibaba.fastjson2.JSONObject;
+import com.mac.kafka.model.ConfigEntity;
+
+import java.util.List;
+
+/**
+ * The interface Kafka consumer config service.
+ *
+ * @author macjay
+ */
+public interface KafkaConsumerConfigService {
+
+    /**
+     * Record kafka offset.
+     *
+     * @param kafkaConsumerConfigId the kafka consumer config id
+     * @param partition             the partition
+     * @param offset                the offset
+     * @return the kafka consumer config
+     */
+    ConfigEntity recordKafkaOffset(long kafkaConsumerConfigId, int partition, long offset);
+
+    /**
+     * Gets kafka offset.
+     *
+     * @param kafkaConsumerConfigId the kafka consumer config id
+     * @return the kafka offset
+     */
+    JSONObject getKafkaOffset(long kafkaConsumerConfigId);
+
+    /**
+     * Find all list.
+     *
+     * @return the list
+     */
+    List<ConfigEntity> findAll();
+
+    /**
+     * Stop consumer boolean.
+     *
+     * @param id the id
+     */
+    void stopConsumer(Long id);
+
+    /**
+     * Start consumer.
+     *
+     * @param id the id
+     */
+    void startConsumer(Long id);
+}
