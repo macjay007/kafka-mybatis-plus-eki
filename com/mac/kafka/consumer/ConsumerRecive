@@ -1,0 +1,86 @@
+package com.mac.kafka.config;
+
+import liquibase.integration.spring.SpringLiquibase;
+import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import javax.sql.DataSource;
+
+@Configuration
+public class LiquibaseConfiguration {
+
+    @Bean
+    @ConfigurationProperties(prefix = "spring.liquibase")
+    public LiquibaseProperties getLiquibaseProperties() {
+        return new LiquibaseProperties();
+    }
+
+    @Bean
+    public SpringLiquibase liquibase(DataSource dataSource) {
+        LiquibaseProperties liquibaseProperties = getLiquibaseProperties();
+        SpringLiquibase liquibase = new SpringLiquibase();
+        liquibase.setChangeLog(liquibaseProperties.getChangeLog());
+        liquibase.setDataSource(dataSource);
+        liquibase.setShouldRun(true);
+        return liquibase;
+    }
+}
+package com.mac.kafka.consumer;
+
+import cn.hutool.extra.spring.SpringUtil;
+import com.mac.kafka.service.KafkaConsumerConfigService;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.TopicPartition;
+import org.springframework.messaging.handler.annotation.Payload;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author macjay
+ */
+@Slf4j
+public class ConsumerRecive extends ConsumerZoningProcessing {
+
+    public ConsumerRecive(long kafkaConsumerConfigId) {
+        super(kafkaConsumerConfigId);
+    }
+
+    public void consumeMessage01(@Payload List<ConsumerRecord<String, String>> consumerRecords) {
+        log.info("consumer01 received message count:{}", consumerRecords.size());
+        processMessage(consumerRecords);
+    }
+
+    public void consumeMessage02(@Payload List<ConsumerRecord<String, String>> consumerRecords) {
+        log.info("consumer02 received message count:{}", consumerRecords.size());
+        processMessage(consumerRecords);
+    }
+
+    private void processMessage(List<ConsumerRecord<String, String>> consumerRecords) {
+        Map<TopicPartition, Long> seekConfiguration = new HashMap<>();
+        for (ConsumerRecord<String, String> consumerRecord : consumerRecords) {
+            log.info("message content: {}", consumerRecord);
+            updateTopicPartitionOffset(consumerRecord, seekConfiguration);
+        }
+        KafkaConsumerConfigService kafkaConsumerConfigService = SpringUtil.getBean(KafkaConsumerConfigService.class);
+        seekConfiguration.forEach((topicPartition, offset) -> {
+            kafkaConsumerConfigService.recordKafkaOffset(kafkaConsumerConfigId, topicPartition.partition(), offset);
+        });
+    }
+
+    private static void updateTopicPartitionOffset(ConsumerRecord<String, String> consumerRecord, Map<TopicPartition, Long> seekConfiguration) {
+        String topic = consumerRecord.topic();
+        int partition = consumerRecord.partition();
+        TopicPartition topicPartition = new TopicPartition(topic, partition);
+        Long offset = seekConfiguration.get(topicPartition);
+        if (offset == null) {
+            seekConfiguration.put(topicPartition, consumerRecord.offset());
+        } else {
+            seekConfiguration.put(topicPartition, Math.max(offset, consumerRecord.offset()));
+        }
+    }
+}
