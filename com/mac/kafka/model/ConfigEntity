@@ -1,0 +1,64 @@
+package com.mac.kafka.model;
+
+import com.alibaba.fastjson2.JSONObject;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * @author macjay
+ */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@TableName("kafka_consumer_config")
+public class ConfigEntity {
+    /**
+     * 主键
+     */
+    @TableId(type = IdType.AUTO)
+    private Long id;
+
+    /**
+     * kafka broker地址
+     */
+    private String kafkaBroker;
+
+    /**
+     * kafka topic
+     */
+    private String kafkaTopic;
+
+    /**
+     * kafka consumer group id
+     */
+    private String kafkaGroupId;
+
+    /**
+     * kafka group id
+     */
+    private String topicOffset;
+
+    /**
+     * 消费者并发数需要和 partition 数量一致
+     */
+    private Integer concurrency;
+
+    /**
+     * 消费者 bean 方法
+     */
+    private String beanMethod;
+
+    /**
+     * kafka 配置
+     */
+    private String kafkaConfig;
+
+    /**
+     * 运行状态
+     */
+    private Integer runStatus;
+}
