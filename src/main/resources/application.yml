@@ -23,29 +23,36 @@ spring:
       idle-timeout: 600000
       auto-commit: true
       minimum-idle: 3
-  kafka:
-    consumer:
-      # 消费者组ID
-      group-id: simple_spring_kafka
-      # 开启自动提交offset
-      enable-auto-commit: true
-      # 单次调用poll()操作时能拉取的最大消息数量
-      max-poll-records: 100
-      # 自动提交offset的时间间隔，单位毫秒
-      auto-commit-interval: 5000
-      # 键的反序列化方式
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      # 值的反序列化方式
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      # 消费者如何对待Kafka中不存在的offset或null的offset
-      auto-offset-reset: earliest # 从最早的消息开始读取
-    listener:
-      # 消费者并发数，即并发消费线程的数量
-      concurrency: 10
-      # poll()调用时的超时时间，单位毫秒
-      poll-timeout: 1500
-    # Kafka集群的地址
-    bootstrap-servers: 172.26.1.151:9092
+kafka:
+  # Kafka集群的地址
+  bootstrap-servers: 172.26.1.151:9092
+  consumer:
+    enable-auto-commit: true
+    group-id: kafka-group-one #群组ID
+    auto-offset-reset: latest
+    auto-commit-interval: 12000 #提交offset延时
+    max-poll-records: 10 #单次拉取消息的最大条数
+    consumer-client-id: kafka-client_${random.uuid}
+    bean-method: com.mac.kafka.consumer.ConsumerRecive#consumeMessage01(java.util.List)
+    enabled: true
+    topics-listen:
+      - send-kafka-custom
+    properties:
+      listener:
+        concurrency: 100
+      max:
+        poll:
+          interval:
+            ms: 60000000
+      session:
+        timeout:
+          ms: 120000 # 消费会话超时时间（超过这个时间 consumer 没有发送心跳，就会触发 rebalance 操作）
+        request:
+          timeout:
+            ms: 18000 # 消费请求的超时时间
+  listener:
+    missing-topics-fatal: false # consumer listener topics 不存在时，启动项目就会报错
+    poll-timeout: 60
 
 # springdoc-openapi 项目配置
 #springdoc:
