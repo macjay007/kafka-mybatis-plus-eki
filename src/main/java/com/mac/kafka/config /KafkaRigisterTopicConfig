@@ -1,0 +1,87 @@
+package com.mac.kafka.config;
+
+import cn.hutool.core.map.MapUtil;
+import com.mac.kafka.handler.KafkaEmqMessageHandler;
+import com.mac.kafka.handler.KafkaMessageHandler;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.*;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import java.time.Duration;
+import java.util.Collections;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+/**
+* 自定义注册topic
+* @author zj
+* @Date 2024/7/5 16:40
+**/
+@Component
+@Slf4j
+public class KafkaRigisterTopicConfig {
+
+    // 存储topic到消息处理器的映射
+    private static ConcurrentMap<String, KafkaMessageHandler<?, ?>> topicHandlers = MapUtil.newConcurrentHashMap();
+    @Resource
+    private   KafkaConsumerProperties kafkaConsumerProperties;
+
+    private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());;
+
+    // 注册主题处理程序
+    public <K, V> void registerTopicHandler(String topic, KafkaMessageHandler<K, V> handler) {
+        topicHandlers.put(topic, handler);
+    }
+
+
+    public <K, V> void startConsumer() {
+        // 设置Kafka消费者配置
+        Properties props = new Properties();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,  kafkaConsumerProperties.getBootstrapServers());
+        props.put(ConsumerConfig.GROUP_ID_CONFIG,  kafkaConsumerProperties.getGroupId());
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        try (Consumer<String, String> consumer = new KafkaConsumer<>(props)) {
+            consumer.subscribe(topicHandlers.keySet());
+            while (!Thread.currentThread().isInterrupted()) {
+                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
+                for (ConsumerRecord<String, String> record : records) {
+                    executorService.submit(()->{
+                        handleRecord(record);
+                    });
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error while consuming Kafka messages", e);
+        }finally {
+            executorService.shutdown();
+        }
+    }
+
+    private void handleRecord(ConsumerRecord<String, String> record) {
+        KafkaMessageHandler<String, String> handler = (KafkaMessageHandler<String, String>) topicHandlers.get(record.topic());
+        if (handler != null) {
+            try {
+                handler.handle(record);
+            } catch (Exception e) {
+                log.error("Error handling record from topic " + record.topic(), e);
+            }
+        } else {
+            log.info("No handler registered for topic: " + record.topic());
+        }
+    }
+
+    @PostConstruct
+    public  void integrationRigisterRun(){
+        kafkaConsumerProperties.getTopicsListen().forEach(e->{
+            registerTopicHandler(e, new KafkaEmqMessageHandler());
+            log.info("自定义注册的 topic: {}",e);
+        });
+        startConsumer();
+    }
+}
