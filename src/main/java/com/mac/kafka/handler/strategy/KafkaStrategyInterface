@@ -1,0 +1,34 @@
+package com.mac.kafka.handler.strategy;
+
+
+import com.mac.kafka.enums.KafkaEnum;
+import com.mac.kafka.handler.param.ReceiveDataParam;
+
+/**
+ * 顶层策略接口
+ *
+ * @author zj
+ * @Date 2023/4/12 8:55
+ **/
+public interface KafkaStrategyInterface {
+
+  /**
+   * 执行策略方法
+   *
+   * @param param
+   * @return boolean
+   * @author zj
+   * @Date 8:56 2023/4/12
+   **/
+  void invokeStrategy(ReceiveDataParam param);
+
+  /**
+   * 获取当前对象对应枚举
+   *
+   * @return com.qif.constants.enums.DiagramDataEnum
+   * @author zj
+   * @Date 8:57 2023/4/12
+   **/
+  KafkaEnum getCommand();
+
+}
