@@ -1,0 +1,36 @@
+package com.mac.kafka.enums;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+/**
+*
+* @author zj
+* @Date 2024/7/8 9:27 
+**/
+@Getter
+@AllArgsConstructor
+public enum KafkaEnum {
+
+    /**
+     * kafka
+     */
+    KAFKA_SEND("send-kafka", "kafka"),
+    /**
+     * kafka
+     */
+    KAFKA_SEND_CUSTOM("send-kafka-custom", "kafka自定义topic"),
+
+    FAILED("9999", "未知类型");
+    private final String requestCmd;
+    private final String desc;
+
+    public static KafkaEnum get(String command) {
+        for (KafkaEnum enums : KafkaEnum.values()) {
+            if (command.equals(enums.getRequestCmd())) {
+                return enums;
+            }
+        }
+        return FAILED;
+    }
+}
