@@ -1,0 +1,40 @@
+package com.mac.kafka.handler.dataconsumer;
+
+
+import com.mac.kafka.annotation.KafkaDataAnnotation;
+import com.mac.kafka.enums.KafkaEnum;
+import com.mac.kafka.handler.param.ReceiveDataParam;
+import com.mac.kafka.handler.strategy.KafkaStrategyInterface;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+
+/**
+* kafka转换
+* @author zj
+* @Date 2023/4/12 15:25
+**/
+@Slf4j
+@Component
+@KafkaDataAnnotation(KafkaEnum.KAFKA_SEND_CUSTOM)
+public class KafKaCustomConsumer implements KafkaStrategyInterface {
+
+
+    @Override
+    public void invokeStrategy(ReceiveDataParam param) {
+        log.info("收到的数据，{}", param.getData());
+    }
+
+    /**
+     *获取当前对象对应枚举
+     * @author zj
+     * @Date 15:24 2023/4/12
+     * @return com.qif.constants.enums.DeviceReportDataEnum
+     **/
+    @Override
+    public KafkaEnum getCommand() {
+        return KafkaEnum.KAFKA_SEND_CUSTOM;
+    }
+}
