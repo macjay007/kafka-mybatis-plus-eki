@@ -1,0 +1,43 @@
+package com.mac.kafka.config;
+
+import com.mac.kafka.annotation.KafkaDataAnnotation;
+import com.mac.kafka.enums.KafkaEnum;
+import com.mac.kafka.handler.strategy.KafkaStrategyInterface;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * @author: Administrator
+ * @date: 2024/7/8
+ */
+@Component
+public class KafkaDataAutoConfig implements ApplicationContextAware {
+    public static final Map<KafkaEnum, KafkaStrategyInterface> msgStrategyMap = new ConcurrentHashMap<>();
+    private final ApplicationContext applicationContext;
+
+    @Autowired
+    public KafkaDataAutoConfig(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
+
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext)   {
+        Map<String, KafkaStrategyInterface> strategies = applicationContext.getBeansOfType(KafkaStrategyInterface.class);
+        for (Map.Entry<String, KafkaStrategyInterface> entry : strategies.entrySet()) {
+            KafkaStrategyInterface strategy = entry.getValue();
+            if (strategy.getClass().isAnnotationPresent(KafkaDataAnnotation.class)) {
+                // 提取注解的值，并将策略添加到Map中
+                KafkaDataAnnotation annotation = strategy.getClass().getAnnotation(KafkaDataAnnotation.class);
+                msgStrategyMap.put(annotation.value(),strategy);
+            }
+        }
+    }
+
+
+}
