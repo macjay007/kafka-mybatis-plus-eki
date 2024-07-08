@@ -1,0 +1,20 @@
+package com.mac.kafka.annotation;
+
+
+
+import com.mac.kafka.enums.KafkaEnum;
+
+import java.lang.annotation.*;
+
+/**
+* 自定义标签
+* @author zj
+* @Date 2023/4/11 13:38
+**/
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
+@Documented
+@Inherited
+public @interface KafkaDataAnnotation {
+    KafkaEnum value();
+}
