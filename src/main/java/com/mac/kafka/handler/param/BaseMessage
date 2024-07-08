@@ -1,0 +1,37 @@
+package com.mac.kafka.handler.param;
+
+
+import lombok.Data;
+
+import java.io.Serializable;
+
+/**
+* 消息体
+* @author zj
+* @Date 2023/11/21 16:36
+**/
+@Data
+public class BaseMessage implements Serializable {
+    private static final long serialVersionUID = -9001583373478825161L;
+
+    /**
+     * 用于标识同一个topic不同业务类型的报文
+     */
+    private Integer requestCmd;
+
+    /**
+     * 请求标识，不可重复
+     */
+    private String requestId;
+
+    /**
+     * 请求时间
+     */
+    private String requestTime;
+
+    /**
+     * stationId
+     */
+    private String stationId;
+
+}
