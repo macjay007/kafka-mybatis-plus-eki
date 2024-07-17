@@ -2,7 +2,7 @@
 
 ## 项目概述
 
-`kafka-mybatis-plus-eki` 是一个基于 Spring 和 emq-kafka-integration   自定义组件高级应用，它旨在提供一个灵活且易于管理的 Kafka 消费者和配置管理工具，此应用的主要目标是为了如何使用emq-kafka-integration（EKI）自定义组件。
+`kafka-mybatis-plus-eki` 是一个基于 Spring 和 （emq-kafka-integration 我自定义组件）高级应用，它旨在提供一个灵活且易于管理的 Kafka 消费者和配置管理工具，此应用的主要目标是为了如何使用emq-kafka-integration（EKI）自定义组件。
 
 ## 主要实现目标
 
