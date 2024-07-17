@@ -1,6 +1,6 @@
 # kafka-mybatis-plus-template
  ```
-本项目是基于springkafka项目 
+本项目是基于springkafka项目 属于一个自定义组件的高级应用范畴
 实现的主要目标
  1、可以自定义管理topic及消费端的动态配置
  2、可以启动、停止消费客户端
