@@ -2,12 +2,14 @@
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <!-- logback项目名称 -->
+    <!-- logback项目名称 -->
     <property name="appName" value="kafka-mp"/>
 
     <!-- 日志级别 DEBUGER INFO WARN ERROR -->
     <property name="logLevel" value="INFO"/>
 
-    <property name="logPath" value="./logs"/>
+    <!-- 日志路径-->
+    <property name="logPath" value="../../logs"/>
 
     <!-- 最大保存时间 30天-->
     <property name="maxHistory" value="3"/>
@@ -17,12 +19,14 @@
 
     <!-- lOGGER  PATTERN 根据个人喜好选择匹配  -->
     <property name="logPattern"
-              value="[ %-5level] [%date{yyyy-MM-dd HH:mm:ss.SSS}] %logger{96} [%line] [%thread]- %msg %n"/>
+              value="[ %-5level] [%date{yyyy-MM-dd HH:mm:ss.SSS}] %logger{96} [%line] [%thread] - %msg%n"/>
     <!-- %d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] %logger - %msg%n -->
     <!-- %d{yyyy-MM-dd HH:mm:ss} %-4relative [%thread] %-5level %logger{35} - %msg %n -->
     <!-- [ %-5level] [%date{yyyy-MM-dd HH:mm:ss.SSS}] %logger{96} [%line] [%thread]- %msg%n  -->
 
     <!-- 动态日志级别 -->
+    <jmxConfigurator/>
+
     <!-- 控制台的标准输出 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -103,8 +107,8 @@
         </encoder>
     </appender>
 
-    <!-- LOG_DEBUG  -->
-    <appender name="LOG_DEBUG" class="ch.qos.logback.classic.AsyncAppender">
+    <!-- ASYNC_LOG_DEBUG  -->
+    <appender name="ASYNC_LOG_DEBUG" class="ch.qos.logback.classic.AsyncAppender">
         <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
         <discardingThreshold>0</discardingThreshold>
         <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
@@ -112,8 +116,8 @@
         <appender-ref ref="FILE_DEBUG"/>
     </appender>
 
-    <!-- LOG_INFO -->
-    <appender name="LOG_INFO" class="ch.qos.logback.classic.AsyncAppender">
+    <!-- ASYNC_LOG_INFO -->
+    <appender name="ASYNC_LOG_INFO" class="ch.qos.logback.classic.AsyncAppender">
         <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
         <discardingThreshold>0</discardingThreshold>
         <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
@@ -121,8 +125,8 @@
         <appender-ref ref="FILE_INFO"/>
     </appender>
 
-    <!-- LOG_WARN -->
-    <appender name="LOG_WARN" class="ch.qos.logback.classic.AsyncAppender">
+    <!-- ASYNC_LOG_WARN -->
+    <appender name="ASYNC_LOG_WARN" class="ch.qos.logback.classic.AsyncAppender">
         <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
         <discardingThreshold>0</discardingThreshold>
         <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
@@ -130,60 +134,36 @@
         <appender-ref ref="FILE_WARN"/>
     </appender>
 
-    <!--LOG_ERROR  -->
-    <appender name="LOG_ERROR" class="ch.qos.logback.classic.AsyncAppender">
+    <!--ASYNC_LOG_ERROR  -->
+    <appender name="ASYNC_LOG_ERROR" class="ch.qos.logback.classic.AsyncAppender">
         <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
         <discardingThreshold>0</discardingThreshold>
         <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
         <queueSize>${queueSize}</queueSize>
         <appender-ref ref="FILE_ERROR"/>
     </appender>
-    <appender name="ICMS-WS-APPENDER"
-              class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>${logPath}/icms-ws.log</File>
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <FileNamePattern>${logPath}/${appName}-ws/${appName}-ws.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
-            <maxHistory>5</maxHistory>
-            <maxFileSize>2GB</maxFileSize>
-            <totalSizeCap>20GB</totalSizeCap>
-        </rollingPolicy>
-        <encoder>
-            <pattern>
-                <![CDATA[%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%level]  [%C{15}:%L] - %m %n ]]> </pattern>
-            <charset>UTF-8</charset>
+    <!--输出到logstash的appender-->
+    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <!--可以访问的logstash日志收集端口-->
+        <destination>172.26.1.151:4560</destination>
+        <encoder charset="UTF-8" class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"serviceName": "${appName}"}</customFields>
         </encoder>
     </appender>
-    <!--mq日志-->
-    <appender name="ICMS-MQ-APPENDER"
-              class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>${logPath}/icms-mq.log</File>
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <FileNamePattern>${logPath}/${appName}-mq/${appName}-mq.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
-            <maxHistory>5</maxHistory>
-            <maxFileSize>2GB</maxFileSize>
-            <totalSizeCap>20GB</totalSizeCap>
-        </rollingPolicy>
-        <encoder>
-            <pattern>
-                <![CDATA[%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%level]  [%C{15}:%L] - %m %n ]]> </pattern>
-            <charset>UTF-8</charset>
-        </encoder>
-    </appender>
+
+    <logger name="org.springframework" level="WARN" />
+    <logger name="org.apache" level="WARN"/>
     <!-- 日志的记录级别 -->
-    <logger name="WS" level="${logLevel}" >
-        <appender-ref ref="ICMS-WS-APPENDER"/>
-    </logger>
-    <logger name="MQ" level="${logLevel}" >
-        <appender-ref ref="ICMS-MQ-APPENDER"/>
-    </logger>
     <!-- 在定义后引用APPENDER -->
     <root level="${logLevel}">
         <!--  控制台  -->
         <appender-ref ref="STDOUT"/>
+
         <!-- 具体的日志级别和文件的配置 -->
-        <appender-ref ref="LOG_DEBUG"/>
-        <appender-ref ref="LOG_INFO"/>
-        <appender-ref ref="LOG_WARN"/>
-        <appender-ref ref="LOG_ERROR"/>
+        <appender-ref ref="ASYNC_LOG_DEBUG"/>
+        <appender-ref ref="ASYNC_LOG_INFO"/>
+        <appender-ref ref="ASYNC_LOG_WARN"/>
+        <appender-ref ref="ASYNC_LOG_ERROR"/>
+        <appender-ref ref="LOGSTASH"/>
     </root>
 </configuration>
